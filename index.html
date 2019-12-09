@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="assets/webvowl.css" />
+</head>
+
+<body>
+    <div id="loading-info" class="hidden">
+        <div id="loading-progress" style="border-radius: 10px;">
+            <div class="hidden">Loading ontology...</div>
+            <div id="layoutLoadingProgressBarContainer"
+                style="padding-bottom: 0;	white-space: nowrap;	overflow: hidden;	text-overflow: ellipsis;">
+                <h4 id="currentLoadingStep"
+                    style="margin: 0;font-style: italic; padding-bottom:0 ;	white-space: nowrap;	overflow: hidden;	text-overflow: ellipsis;">
+                    Layout optimization</h4>
+                <div id="progressBarContext">
+                    <div id="progressBarValue" class="busyProgressBar"></div>
+                </div>
+            </div>
+            <div id="loadingInfo_msgBox" style="padding-bottom: 0;padding-top:0">
+                <div id="show-loadingInfo-button" class="accordion-trigger noselect">Details</div>
+                <div id="loadingInfo-container">
+                    <ul id="bulletPoint_container"></ul>
+                </div>
+            </div>
+            <div>
+                <span id="loadingIndicator_closeButton" class="">Close Warning</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="graph"></div>
+
+
+    <div id="emptyContainer">
+        <a href="#opts=editorMode=true;#new_ontology1" id="empty" style="pointer-events:none; padding-left:0">
+            Create new ontology</a>
+    </div>
+
+    <ul>
+        <li id="c_locate">
+            <a style="padding: 0 8px 5px 8px;" draggable="false" title="Nothing to locate, enter search term." href="#"
+                id="locateSearchResult">&#8982;
+            </a>
+        </li>
+    </ul>
+    <script src="assets/d3.min.js"></script>
+    <script src="assets/webvowl.js"></script>
+    <script>
+        window.onload = function () {
+            console.log(webvowl);
+            let graph = webvowl.graph();
+            let options = graph.graphOptions();
+
+
+            function adjustSize() {
+                let graphContainer = d3.select("#graph");
+                let svg = graphContainer.select("svg");
+
+                let height = window.innerHeight /*- 40*/;
+                let width = window.innerWidth /*- (window.innerWidth * 0.22)*/;
+
+                graphContainer.style("height", height + "px");
+                svg
+                    .attr("width", width)
+                    .attr("height", height);
+                options
+                    .width(width)
+                    .height(height);
+
+                graph.updateStyle();
+            }
+
+            function loadOntologyFromText(jsonText, filename = "NAME", alternativeFilename = "ALTERNATIVE") {
+                if ((jsonText === undefined && filename === undefined) || (jsonText.length === 0)) {
+                    console.log("INVALID: EMPTY");
+                    return;
+                }
+
+                graph.editorMode(); // updates the checkbox
+                var data;
+                if (jsonText) {
+                    // validate JSON FILE
+                    var validJSON;
+                    try {
+                        data = JSON.parse(jsonText);
+                        validJSON = true;
+                    } catch (e) {
+                        validJSON = false;
+                    }
+                    if (validJSON === false) {
+                        // the server output is not a valid json file
+                        console.log("INVALID: PARSE");
+                        return;
+                    }
+                }
+
+                // check if we have graph data
+                var classCount = 0;
+                if (data.class !== undefined) {
+                    classCount = data.class.length;
+                }
+
+                var loadEmptyOntologyForEditing = false;
+                if (location.hash.indexOf("#new_ontology") !== -1) {
+                    loadEmptyOntologyForEditing = true;
+                    newOntologyCounter++;
+                    d3.select("#empty").node().href = "#opts=editorMode=true;#new_ontology" + newOntologyCounter;
+                }
+                if (classCount === 0 && graph.editorMode() === false && loadEmptyOntologyForEditing === false) {
+                    // generate message for the user;
+                    console.log("INVALID: EMPTY");
+                } else {
+                    loadingModule.validJsonFile();
+                    options.data(data);
+                    graph.load();
+                    graph.updateZoomSliderValueFromOutside();
+                    adjustSize();
+                }
+            }
+
+
+            let loadingModule = new class {
+                loadingWasSuccessFul = false;
+
+                successfullyLoadedOntology() {
+                    return this.loadingWasSuccessFul;
+                }
+                validJsonFile() {
+                    this.loadingWasSuccessFul = true;
+                }
+
+
+                collapseDetails() {
+                }
+                setErrorMode() {
+                    // console.error("ERROR MODE!!");
+                }
+
+
+                setPercentMode() { }
+                setPercentValue(val) {
+                    console.log(val);
+                    d3.select("#progressBarValue").node().innherHTML = val;
+                }
+
+                missingImportsWarning() { }
+                showWarningDetailsMessage() {}
+            }
+
+            let warningModule = new class {
+                closeFilterHint() { }
+                showEditorHint() { }
+            }
+
+            let ontologyMenu = new class {
+                append_bulletPoint() { }
+                append_message_toLastBulletPoint() { }
+            }
+
+            let editSidebar = new class {
+                clearMetaObjectValue() { }
+                updateGeneralOntologyInfo() { }
+                updatePrefixUi() { }
+                updateElementWidth() { }
+                updateSelectionInformation() { }
+
+            }
+
+            let leftSidebar = new class {
+                isSidebarVisible() { }
+            }
+
+            let searchMenu = new class {
+                requestDictionaryUpdate() { }
+            }
+
+            let zoomSlider = new class {
+                updateZoomSliderValue() { }
+            }
+
+            let colorExternalsSwitch = webvowl.modules.colorExternalsSwitch(graph);
+            let compactNotationSwitch = webvowl.modules.compactNotationSwitch(graph);
+            let datatypeFilter = webvowl.modules.datatypeFilter();
+            let disjointFilter = webvowl.modules.disjointFilter();
+            let focuser = webvowl.modules.focuser(graph);
+            let emptyLiteralFilter = webvowl.modules.emptyLiteralFilter();
+            let nodeScalingSwitch = webvowl.modules.nodeScalingSwitch(graph);
+            let objectPropertyFilter = webvowl.modules.objectPropertyFilter();
+            let pickAndPin = webvowl.modules.pickAndPin();
+            let statistics = webvowl.modules.statistics();
+            let subclassFilter = webvowl.modules.subclassFilter();
+            let setOperatorFilter = webvowl.modules.setOperatorFilter();
+
+
+            options.graphContainerSelector("#graph");
+
+            options.loadingModule(loadingModule);
+            options.warningModule(warningModule);
+            options.ontologyMenu(ontologyMenu);
+            options.editSidebar(editSidebar);
+            options.leftSidebar(leftSidebar);
+            options.searchMenu(searchMenu);
+            options.literalFilter(emptyLiteralFilter);
+            options.zoomSlider(zoomSlider);
+
+
+            options.selectionModules().push(focuser);
+            options.selectionModules().push(pickAndPin);
+            options.filterModules().push(emptyLiteralFilter);
+            options.filterModules().push(statistics);
+            options.filterModules().push(datatypeFilter);
+            options.filterModules().push(objectPropertyFilter);
+            options.filterModules().push(subclassFilter);
+            options.filterModules().push(disjointFilter);
+            options.filterModules().push(setOperatorFilter);
+            options.filterModules().push(nodeScalingSwitch);
+            options.filterModules().push(compactNotationSwitch);
+            options.filterModules().push(colorExternalsSwitch);
+
+            options.literalFilter(emptyLiteralFilter);
+            options.loadingModule(loadingModule);
+            options.pickAndPinModule(pickAndPin);
+            options.searchMenu(searchMenu);
+            options.ontologyMenu(ontologyMenu);
+            options.editSidebar(editSidebar);
+            options.graphObject(graph);
+            options.zoomSlider(zoomSlider);
+            options.warningModule(warningModule);
+            options.datatypeFilter(datatypeFilter);
+            options.objectPropertyFilter(objectPropertyFilter);
+            options.subclassFilter(subclassFilter);
+            options.setOperatorFilter(setOperatorFilter);
+            options.disjointPropertyFilter(disjointFilter);
+            options.focuserModule(focuser);
+            options.colorExternalsModule(colorExternalsSwitch);
+            options.compactNotationModule(compactNotationSwitch);
+
+            d3.select(window).on("resize", adjustSize);
+            graph.start();
+
+            let fileToRead = "./" + "ind-demo-vowl.json";
+            d3.xhr(fileToRead, "application/json", function (error, request) {
+                var loadingSuccessful = !error;
+                if (loadingSuccessful) {
+                    ontologyContent = request.responseText;
+                    // console.log(ontologyContent);
+                    loadOntologyFromText(ontologyContent);
+                } else {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
