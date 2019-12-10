@@ -199,6 +199,9 @@ window.app = new class {
 
 
         // START -- Instantiate minimum required modules NOT in the library
+        // The modules only has empty methods for the happy path.
+        // More investigation will require to extract all the necessary methods for every app module
+        // And if more modules are needed or need an exact configuration
 
         const loadingModule = appModules.loadingModule(graph);
         options.loadingModule(loadingModule);
