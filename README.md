@@ -12,6 +12,7 @@ Original source code: [VisualDataWeb/WebVOWL](https://github.com/VisualDataWeb/W
 │   └── webvowl.js                      # WebVOWL library JS bundled code
 │   └── webvowl.css                     # WebVOWL library CSS bundled code
 ├── .gitignore                          # Ignore file for git
+├── app.js                              # JS file with the code to run the WebVOWL library
 ├── ind-demo-vowl.json                  # JSON file with the VOWL description fo the industrial demo
 ├── index.html                          # HTML file with the minimum to run the test
 └── README.MD                           # this
