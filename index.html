@@ -7,48 +7,32 @@
 </head>
 
 <body>
-    <div id="loading-info" class="hidden">
-        <div id="loading-progress" style="border-radius: 10px;">
-            <div class="hidden">Loading ontology...</div>
-            <div id="layoutLoadingProgressBarContainer"
-                style="padding-bottom: 0;	white-space: nowrap;	overflow: hidden;	text-overflow: ellipsis;">
-                <h4 id="currentLoadingStep"
-                    style="margin: 0;font-style: italic; padding-bottom:0 ;	white-space: nowrap;	overflow: hidden;	text-overflow: ellipsis;">
-                    Layout optimization</h4>
-                <div id="progressBarContext">
-                    <div id="progressBarValue" class="busyProgressBar"></div>
-                </div>
-            </div>
-            <div id="loadingInfo_msgBox" style="padding-bottom: 0;padding-top:0">
-                <div id="show-loadingInfo-button" class="accordion-trigger noselect">Details</div>
-                <div id="loadingInfo-container">
-                    <ul id="bulletPoint_container"></ul>
-                </div>
-            </div>
-            <div>
-                <span id="loadingIndicator_closeButton" class="">Close Warning</span>
-            </div>
-        </div>
+    <!-- Elements used when loading data -->
+    <div id="loading-info">
+        <div id="progressBarValue" class="busyProgressBar"></div>
     </div>
 
+    <!-- Elements used when called `graph.editorMode()`  -->
+    <div id="emptyContainer">
+        <a href="#" id="empty">Create new ontology</a>
+    </div>
+
+    <!-- Elements used when set `graph.editorMode(false)` -->
+    <div id="compactNotationOption">
+        <span id="compactnotationModuleCheckbox"></span>
+    </div>
+
+    <!-- Elements used when graph data is loaded `graph.load()` -->
+    <a title="Nothing to locate" href="#" id="locateSearchResult">&#8982;</a>
+
+    <!-- Where the graph will be rendered -->
     <div id="graph"></div>
 
-
-    <div id="emptyContainer">
-        <a href="#opts=editorMode=true;#new_ontology1" id="empty" style="pointer-events:none; padding-left:0">
-            Create new ontology</a>
-    </div>
-
-    <ul>
-        <li id="c_locate">
-            <a style="padding: 0 8px 5px 8px;" draggable="false" title="Nothing to locate, enter search term." href="#"
-                id="locateSearchResult">&#8982;
-            </a>
-        </li>
-    </ul>
     <script src="assets/d3.min.js"></script>
     <script src="assets/webvowl.js"></script>
+
     <script src="./app.js"></script>
+    <!-- Start the app script -->
     <script>window.onload = window.app.initialize()</script>
 </body>
 

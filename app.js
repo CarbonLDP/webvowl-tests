@@ -19,8 +19,8 @@ const appModules = new class {
 
             setPercentMode() { }
             setPercentValue(val) {
-                // Not necessary, but already used in other modules
-                d3.select("#progressBarValue").node().innherHTML = val;
+                // WebVOWL app uses:
+                // d3.select("#progressBarValue").node().innherHTML = val;
             }
 
             missingImportsWarning() { }
@@ -47,8 +47,7 @@ const appModules = new class {
                     return;
                 }
 
-                // updates the checkbox
-                graph.editorMode();
+                graph.editorMode(false);
 
                 let data;
                 if (jsonText) {
@@ -66,7 +65,7 @@ const appModules = new class {
                     classCount = data.class.length;
                 }
 
-                if (classCount === 0 && graph.editorMode() === false) {
+                if (classCount === 0) {
                     console.log("INVALID: EMPTY");
                 } else {
                     this.validJsonFile();
@@ -93,6 +92,13 @@ const appModules = new class {
         }
     }
 
+    sidebar() {
+        return new class {
+            updateShowedInformation() { }
+            clearOntologyInformation() { }
+        }
+    }
+
     editSidebar() {
         return new class {
             clearMetaObjectValue() { }
@@ -106,12 +112,15 @@ const appModules = new class {
     leftSidebar() {
         return new class {
             isSidebarVisible() { }
+            showSidebar() { }
+            hideCollapseButton() { }
         }
     }
 
     searchMenu() {
         return new class {
             requestDictionaryUpdate() { }
+            clearText() { }
         }
     }
 
@@ -130,11 +139,10 @@ window.app = new class {
     initialize() {
         // START -- Instantiate the base lib objects
 
-        const graph = webvowl.graph();
+        const graph = webvowl.graph("#graph");
 
         const options = graph.graphOptions();
         options.graphObject(graph);
-        options.graphContainerSelector("#graph");
 
         // END -- Instantiate the base lib objects
 
@@ -200,6 +208,9 @@ window.app = new class {
 
         const ontologyMenu = appModules.ontologyMenu();
         options.ontologyMenu(ontologyMenu);
+
+        const sidebar = appModules.sidebar();
+        options.sidebar(sidebar);
 
         const editSidebar = appModules.editSidebar();
         options.editSidebar(editSidebar);
